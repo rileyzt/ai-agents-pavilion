@@ -1,0 +1,5 @@
+HighIQ Voice Agent
+HighIQ Voice Agent is a Node.js-based AI-powered voice assistant designed for businesses to handle inbound/outbound phone calls with human-like efficiency.
+It integrates speech-to-text (STT), large language model (LLM) intelligence, and text-to-speech (TTS) to create a seamless conversational experience for customers.
+
+Repo Link - https://github.com/rileyzt/highiq-voiceagent
