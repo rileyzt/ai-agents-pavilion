@@ -1,0 +1,1 @@
+Action: {'code': "import pandas as pd\nfrom sklearn.feature_extraction.text import TfidfVectorizer\nfrom sklearn.metrics.pairwise import cosine_similarity", 'libraries_used': ['pandas', 'sklearn']}
