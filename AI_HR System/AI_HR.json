@@ -1,0 +1,1388 @@
+{
+  "name": "AI_HR",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            },
+            {}
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "1wv_HkcW7hvNjUEOf6YlIXGmEetAjhqo59aMEdV0C9kY",
+          "mode": "list",
+          "cachedResultName": "HR Department",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wv_HkcW7hvNjUEOf6YlIXGmEetAjhqo59aMEdV0C9kY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "New Hires",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wv_HkcW7hvNjUEOf6YlIXGmEetAjhqo59aMEdV0C9kY/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        208,
+        128
+      ],
+      "id": "69938325-5793-4be9-8314-9f1d9ef23d9f",
+      "name": "Google Sheets Trigger",
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "vGqD9VoQ0jHMU61s",
+          "name": "Google Sheets Trigger account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.Email }}",
+        "subject": "=Welcome to the Team!",
+        "emailType": "text",
+        "message": "=Hi {{ $json.Name }},  Welcome to Underground Automation! 🎉   Your onboarding journey starts soon.   Your manager {{ $json.Manager }} will reach out to you.  See you on {{ $json['Date of Joining'] }}  \n\nBest,   \nHR Team",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        608,
+        128
+      ],
+      "id": "7f2f2673-35bf-480a-9563-6e0460957210",
+      "name": "Gmail",
+      "webhookId": "3934823a-0687-4915-a70e-323ced50e569",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ywKyx7fAO6SzLK5n",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const dateOfJoiningSerial = item.json[\"Date of Joining\"];\n  const birthdaySerial = item.json[\"Birthday\"];\n\n  // Google Sheets Base Date (Dec 30, 1899)\n  const baseDate = new Date(1899, 11, 30);\n\n  // Convert serial numbers to milliseconds and add\n  const joiningDate = new Date(baseDate.getTime() + dateOfJoiningSerial * 24 * 60 * 60 * 1000);\n  const birthdayDate = new Date(baseDate.getTime() + birthdaySerial * 24 * 60 * 60 * 1000);\n\n  item.json[\"Date of Joining\"] = joiningDate.toISOString().split('T')[0]; // Format YYYY-MM-DD\n  item.json[\"Birthday\"] = birthdayDate.toISOString().split('T')[0];\n\n  return item;\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        384,
+        128
+      ],
+      "id": "768bd9fe-d430-48ef-8963-5916f55171d6",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "pervezonboard@gmail.com",
+          "mode": "list",
+          "cachedResultName": "pervezonboard@gmail.com"
+        },
+        "start": "={{ $json['Orientation Start'] }}",
+        "end": "={{ $json['Orientation End'] }}",
+        "additionalFields": {
+          "description": "=Welcome session for {{ $('Code').item.json.Name }} led by {{ $('Code').item.json.Manager }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        624,
+        368
+      ],
+      "id": "34287f09-fbea-4d57-8a79-8a0197530413",
+      "name": "Google Calendar",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "1JxyJnona6vtTB4c",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const joiningDateStr = item.json[\"Date of Joining\"]; // \"2025-05-15\"\n\n  const start = new Date(joiningDateStr + 'T09:00:00Z');\n  const end = new Date(joiningDateStr + 'T11:00:00Z');\n\n  item.json[\"Orientation Start\"] = start.toISOString();\n  item.json[\"Orientation End\"] = end.toISOString();\n\n  return item;\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        400,
+        368
+      ],
+      "id": "a7a1e4a7-34a8-467a-be7a-dbc418b276b1",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8e0d84eb-029a-4c7f-a116-28cfb3063e7e",
+              "name": "Date of Joining",
+              "value": "={{ $('Code').item.json['Date of Joining'] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        368
+      ],
+      "id": "0d60e2ad-a9c2-4e95-bf88-99ac79969391",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "chatId": "5120645866",
+        "text": "=🚀 New Hire Alert:  {{ $('Code').item.json.Name }}  is joining your team on{{ $('Code').item.json['Date of Joining'] }} .   Please prepare their onboarding plan!",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        864,
+        128
+      ],
+      "id": "4c3a88d8-9705-4387-9328-0c1176bdce34",
+      "name": "Telegram",
+      "webhookId": "7b233ac0-0814-4ddc-83ca-0c2da4a68fa0",
+      "credentials": {
+        "telegramApi": {
+          "id": "HvjPzU6pFqn6BiS5",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## New Employee Onboarding",
+        "height": 580,
+        "width": 1100,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "ae0b1ee0-ff1e-4ad7-b9e4-b28efae1df2d",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        1328,
+        192
+      ],
+      "id": "8bdc5a3a-4294-4727-9e11-257976a5ff65",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1wv_HkcW7hvNjUEOf6YlIXGmEetAjhqo59aMEdV0C9kY",
+          "mode": "list",
+          "cachedResultName": "HR Department",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wv_HkcW7hvNjUEOf6YlIXGmEetAjhqo59aMEdV0C9kY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1049306902,
+          "mode": "list",
+          "cachedResultName": "Employee Review Schedule",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wv_HkcW7hvNjUEOf6YlIXGmEetAjhqo59aMEdV0C9kY/edit#gid=1049306902"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1552,
+        192
+      ],
+      "id": "687b457f-1298-4ce6-9939-151ae1043483",
+      "name": "Google Sheets1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "oW9H3bdoJn78pqpb",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const today = new Date();\nconst oneWeekFromNow = new Date();\noneWeekFromNow.setDate(today.getDate() + 7);\n\nreturn items.filter(item => {\n  const dueDate = new Date(item.json[\"Next Review Due\"]);\n  return dueDate >= today && dueDate <= oneWeekFromNow;\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1744,
+        192
+      ],
+      "id": "b8662c05-7ef7-44d2-9b0f-c641b472bdc1",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json['Manager Email'] }}",
+        "subject": "=📋 Upcoming Performance Review: {{ $json.Name }}",
+        "emailType": "text",
+        "message": "=Hi {{ $json.Manager }},  \nJust a reminder that {{ $json.Name }} has a performance review scheduled on {{ $json['Next Review Due'] }} .   \nPlease prepare notes and book a time with the employee.  You can access the review template here: [Review Form Link]  \n\nThanks,   \nHR Team",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1328,
+        432
+      ],
+      "id": "6255356a-ee33-4509-a09c-3d5b35dad045",
+      "name": "Gmail1",
+      "webhookId": "81581137-4cab-4da1-a799-596d5970ce49",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ywKyx7fAO6SzLK5n",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "5120645866",
+        "text": "=🔔 Reminder: Performance Review for {{ $('Code2').item.json.Name }} is due on {{ $('Code2').item.json['Next Review Due'] }}. Please prepare ahead of time.",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1552,
+        432
+      ],
+      "id": "60e12ad7-56b0-42bc-ba29-2098d1a14ca4",
+      "name": "Telegram1",
+      "webhookId": "744d8bac-d25a-421f-b5c6-640493993ea7",
+      "credentials": {
+        "telegramApi": {
+          "id": "HvjPzU6pFqn6BiS5",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const reviewDateStr = item.json[\"Next Review Due\"]; // e.g., \"2025-05-15\"\n\n  // Build full datetime strings\n  const start = reviewDateStr + \"T10:00:00.000Z\";\n  const end = reviewDateStr + \"T11:00:00.000Z\";\n\n  item.json[\"Review Start\"] = start;\n  item.json[\"Review End\"] = end;\n\n  return item;\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        432
+      ],
+      "id": "3a197c5d-0f0a-4658-a7ea-00b31b9c79d8",
+      "name": "Code3"
+    },
+    {
+      "parameters": {
+        "content": "## Performance Review Reminder",
+        "height": 580,
+        "width": 800
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        48
+      ],
+      "id": "70936de2-b475-4063-a9c8-26cbee4bdc27",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "formTitle": "Leave Request",
+        "formDescription": "Leave Request",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Employee ID",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Email",
+              "fieldType": "email",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Leave Type",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Start Date",
+              "fieldType": "date",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "End Date",
+              "fieldType": "date",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Reason",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        32,
+        912
+      ],
+      "id": "d13eccd5-c7a3-4bc4-87d7-05008156c46a",
+      "name": "On form submission",
+      "webhookId": "f0a7fc96-06a2-4c36-b309-7ad2a3a5a276"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "ed9954be-89bd-4dac-8ee2-fda16b25e8ea",
+              "leftValue": "={{ $('On form submission').item.json['Leave Type'] }}",
+              "rightValue": "Sick Leave",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "576635fe-eab7-434b-9731-5e39f67ad150",
+              "leftValue": "={{ $('Calculate Duration').item.json.Duration }}",
+              "rightValue": 2,
+              "operator": {
+                "type": "number",
+                "operation": "lte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        464,
+        912
+      ],
+      "id": "73e2369c-7851-452b-91cb-376984a4c40d",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const start = new Date(item.json[\"Start Date\"]);\n  const end = new Date(item.json[\"End Date\"]);\n  \n  const diffTime = Math.abs(end - start);\n  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // Include start & end day\n\n  item.json[\"Duration\"] = diffDays;\n  return item;\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        912
+      ],
+      "id": "62aef7c8-1b91-4577-abf4-a3cb60e94035",
+      "name": "Calculate Duration"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1wv_HkcW7hvNjUEOf6YlIXGmEetAjhqo59aMEdV0C9kY",
+          "mode": "list",
+          "cachedResultName": "HR Department",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wv_HkcW7hvNjUEOf6YlIXGmEetAjhqo59aMEdV0C9kY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 702005201,
+          "mode": "list",
+          "cachedResultName": "Leave Tracker",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wv_HkcW7hvNjUEOf6YlIXGmEetAjhqo59aMEdV0C9kY/edit#gid=702005201"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Employee ID": "={{ $('On form submission').item.json['Employee ID'] }}",
+            "Name": "={{ $('On form submission').item.json.Name }}",
+            "Leave Type": "={{ $('On form submission').item.json['Leave Type'] }}",
+            "Start Date": "={{ $('On form submission').item.json['Start Date'] }}",
+            "End Date": "={{ $('On form submission').item.json['End Date'] }}",
+            "Status": "Approved"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Employee ID",
+              "displayName": "Employee ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Leave Type",
+              "displayName": "Leave Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Start Date",
+              "displayName": "Start Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "End Date",
+              "displayName": "End Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        704,
+        752
+      ],
+      "id": "916487a4-e4af-47e9-a0ab-5e8587e4f940",
+      "name": "Auto Approved",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "oW9H3bdoJn78pqpb",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('If').item.json.Email }}",
+        "subject": "✅ Your Leave Has Been Approved!",
+        "emailType": "text",
+        "message": "=Hi {{ $('On form submission').item.json.Name }},  Good news! Your leave request from {{ $('On form submission').item.json['Start Date'] }} to {{ $('On form submission').item.json['End Date'] }} has been automatically approved.  Wishing you a speedy recovery!  \nBest,   \nHR Team",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        880,
+        752
+      ],
+      "id": "6c7eb56f-8bf2-4c49-8763-95c135f0a8fb",
+      "name": "Email to Employee",
+      "webhookId": "2f81950c-df0b-4a70-842f-8c2e344b0ddd",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ywKyx7fAO6SzLK5n",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1O4beXRXGdk2jVh6FzAGV7wn9cguWvudj0vV-n978MXs",
+          "mode": "list",
+          "cachedResultName": "HR Department",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1O4beXRXGdk2jVh6FzAGV7wn9cguWvudj0vV-n978MXs/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1971162088,
+          "mode": "list",
+          "cachedResultName": "Leave Tracker",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1O4beXRXGdk2jVh6FzAGV7wn9cguWvudj0vV-n978MXs/edit#gid=1971162088"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Employee ID": "={{ $('On form submission').item.json['Employee ID'] }}",
+            "Name": "={{ $('On form submission').item.json.Name }}",
+            "Leave Type": "={{ $('On form submission').item.json['Leave Type'] }}",
+            "Start Date": "={{ $('On form submission').item.json['Start Date'] }}",
+            "End Date": "={{ $('On form submission').item.json['End Date'] }}",
+            "Status": "Pending"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Employee ID",
+              "displayName": "Employee ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Leave Type",
+              "displayName": "Leave Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Start Date",
+              "displayName": "Start Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "End Date",
+              "displayName": "End Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        704,
+        1008
+      ],
+      "id": "f3bd25d4-588c-4a46-a409-4dd6899a012d",
+      "name": "Pending",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "oW9H3bdoJn78pqpb",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "5120645866",
+        "text": "=New Leave Request: \n- Name:{{ $json.Name }}  \n- Dates: {{ $json['Start Date'] }} to {{ $json['End Date'] }} \n- Type: {{ $json['Leave Type'] }} \n- Reason: {{ $('Calculate Duration').item.json.Reason }}\n- Duration: {{ $('If').item.json.Duration }}\n\n\nPlease Review",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        880,
+        1008
+      ],
+      "id": "83d7a43d-b644-4b85-a00a-f73752e23fad",
+      "name": "Notify Manager",
+      "webhookId": "cecf217a-d271-4452-b8a7-420030aed83b",
+      "credentials": {
+        "telegramApi": {
+          "id": "HvjPzU6pFqn6BiS5",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Leave Request Management",
+        "height": 640,
+        "width": 1240,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -128,
+        640
+      ],
+      "id": "82add9b0-53d9-40ae-b2b6-e8ff0ebe8049",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "data[0].b64_json",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1552,
+        784
+      ],
+      "id": "a84d0849-c57f-4d2d-82e2-37aad68e87cf",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/images/generations",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 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"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "gpt-image-1"
+            },
+            {
+              "name": "prompt",
+              "value": "={{ $json.imagePrompt }}"
+            },
+            {
+              "name": "size",
+              "value": "1024x1024"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1344,
+        784
+      ],
+      "id": "59ef1dbc-14ff-4ea8-8fd9-60b111ccdd1d",
+      "name": "Image Generator"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/images/generations",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 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"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "gpt-image-1"
+            },
+            {
+              "name": "prompt",
+              "value": "={{ $json.imagePrompt }}"
+            },
+            {
+              "name": "size",
+              "value": "1024x1024"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1360,
+        1232
+      ],
+      "id": "2a21f559-fd3d-4d0e-bffd-47410b16a4fb",
+      "name": "Image Generator1"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "data[0].b64_json",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1568,
+        1232
+      ],
+      "id": "c7f3de5c-b78f-4320-a907-c562e6722a4b",
+      "name": "Convert to File1"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1wv_HkcW7hvNjUEOf6YlIXGmEetAjhqo59aMEdV0C9kY",
+          "mode": "list",
+          "cachedResultName": "HR Department",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wv_HkcW7hvNjUEOf6YlIXGmEetAjhqo59aMEdV0C9kY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1503674841,
+          "mode": "list",
+          "cachedResultName": "Employee Master Database",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wv_HkcW7hvNjUEOf6YlIXGmEetAjhqo59aMEdV0C9kY/edit#gid=1503674841"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1504,
+        944
+      ],
+      "id": "43baf345-bb7c-4f01-8c78-46a650f81ef9",
+      "name": "Master Database",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "oW9H3bdoJn78pqpb",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const today = new Date();\nconst currentMonth = today.getMonth();\nconst currentDate = today.getDate();\n\nreturn items.filter(item => {\n  const birthday = new Date(item.json[\"Birthday\"]);\n  const doj = new Date(item.json[\"Date of Joining\"]);\n\n  const isBirthday =\n    birthday.getMonth() === currentMonth &&\n    birthday.getDate() === currentDate;\n\n  const isAnniversary =\n    doj.getMonth() === currentMonth &&\n    doj.getDate() === currentDate;\n\n  item.json[\"isBirthday\"] = isBirthday;\n  item.json[\"isAnniversary\"] = isAnniversary;\n\n  if (isBirthday) {\n    item.json[\"imagePrompt\"] = \"cute cartoon birthday cake with balloons and confetti\";\n  } else if (isAnniversary) {\n    item.json[\"imagePrompt\"] = \"happy work anniversary celebration in office setting\";\n  }\n\n  return isBirthday || isAnniversary;\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1680,
+        944
+      ],
+      "id": "be7d0225-cfc2-4b9e-bff1-af450ab39b13",
+      "name": "Get Bday/Anniversary"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d141cc13-7870-464c-814a-b7b8e4d0c8f1",
+              "leftValue": "={{ $json.isBirthday }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1888,
+        944
+      ],
+      "id": "7895d41b-8fc5-473e-bf73-8c066bf39494",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Master Database').item.json.Email }}",
+        "subject": "Happy Birthday",
+        "message": "=Hi {{ $('Get Bday/Anniversary').item.json.Name }},<br><br>  🎉 <strong>Happy {{ isBirthday ? \"Birthday\" : \"Work Anniversary\" }}!</strong><br><br>  We’re so glad to have you on the team.   Enjoy your day — you deserve it! \nBest wishes,   <br>The Automation Underground Team",
+        "options": {
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {}
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1760,
+        784
+      ],
+      "id": "48e71133-2bb2-4c3b-899f-db359126eb9d",
+      "name": "Gmail2",
+      "webhookId": "01c20519-f6f1-4e89-befc-b095539226c3",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ywKyx7fAO6SzLK5n",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Master Database').item.json.Email }}",
+        "subject": "Happy Birthday",
+        "message": "=Hi {{ $('Get Bday/Anniversary').item.json.Name }},<br><br>  🎉 <strong>Happy {{ isBirthday ? \"Birthday\" : \"Work Anniversary\" }}!</strong><br><br>  We’re so glad to have you on the team.   Enjoy your day — you deserve it! \nBest wishes,   <br>The Automation Underground Team",
+        "options": {
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {}
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1760,
+        1232
+      ],
+      "id": "43cd4b04-ac15-4688-a4f3-347001b8715f",
+      "name": "Gmail3",
+      "webhookId": "01c20519-f6f1-4e89-befc-b095539226c3",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ywKyx7fAO6SzLK5n",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Birthday & Work Anniversary Wishes",
+        "height": 740,
+        "width": 920,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        672
+      ],
+      "id": "eaa189dc-7e33-431d-9e4e-7a107c6b374f",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1wv_HkcW7hvNjUEOf6YlIXGmEetAjhqo59aMEdV0C9kY",
+          "mode": "list",
+          "cachedResultName": "HR Department",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wv_HkcW7hvNjUEOf6YlIXGmEetAjhqo59aMEdV0C9kY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1503674841,
+          "mode": "list",
+          "cachedResultName": "Employee Master Database",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wv_HkcW7hvNjUEOf6YlIXGmEetAjhqo59aMEdV0C9kY/edit#gid=1503674841"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Employee ID": "={{ $('Code').item.json['Employee ID'] }}",
+            "Name": "={{ $('Code').item.json.Name }}",
+            "Email": "={{ $('Code').item.json.Email }}",
+            "Phone": "={{ $('Code').item.json.Phone }}",
+            "Department": "={{ $('Code').item.json.Department }}",
+            "Manager": "={{ $('Code').item.json.Manager }}",
+            "Birthday": "={{ $('Code').item.json['Birthday'] }}\n",
+            "Date of Joining": "={{ $('Code').item.json['Date of Joining'] }}",
+            "Status": "Active"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Employee ID",
+              "displayName": "Employee ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Department",
+              "displayName": "Department",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Manager",
+              "displayName": "Manager",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Birthday",
+              "displayName": "Birthday",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date of Joining",
+              "displayName": "Date of Joining",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        864,
+        384
+      ],
+      "id": "03e44327-6f95-4c1c-a17f-e4969d938c56",
+      "name": "Update Sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "oW9H3bdoJn78pqpb",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Sheets Trigger": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Calendar": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Google Calendar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram": {
+      "main": [
+        [
+          {
+            "node": "Update Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets1": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Gmail1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail1": {
+      "main": [
+        [
+          {
+            "node": "Telegram1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram1": {
+      "main": [
+        [
+          {
+            "node": "Code3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Calculate Duration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Auto Approved",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Pending",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Duration": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Auto Approved": {
+      "main": [
+        [
+          {
+            "node": "Email to Employee",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pending": {
+      "main": [
+        [
+          {
+            "node": "Notify Manager",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Gmail2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image Generator": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image Generator1": {
+      "main": [
+        [
+          {
+            "node": "Convert to File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File1": {
+      "main": [
+        [
+          {
+            "node": "Gmail3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Master Database": {
+      "main": [
+        [
+          {
+            "node": "Get Bday/Anniversary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Bday/Anniversary": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Image Generator",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Image Generator1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "01635b37-977c-40ca-af59-fa21690ab8d5",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "77d60c5f482b8b25c4a9e2559802b3dbdc4df0e6722e1f3fbe7d06a50961ff49"
+  },
+  "id": "WiqXQ7wiKWCdhGCo",
+  "tags": []
+}
